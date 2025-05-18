@@ -5,7 +5,8 @@
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "LoopControllerGUI"
 screenGui.ResetOnSpawn = false
-screenGui.Parent = game:GetService("StarterGui")
+screenGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+
 
 -- Create Visibility Toggle Button
 local visibilityBtn = Instance.new("TextButton")
