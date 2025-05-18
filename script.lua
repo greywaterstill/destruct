@@ -16,27 +16,27 @@ local isRunning = false
 -- Sequence functions (direct FireServer calls)
 local function equipMeteor()
     local args = {"wep_meteor"}
-    eventsFolder:WaitForChild("PlaySound"):FireServer(unpack(args))
+    eventsFolder:WaitForChild("ReplicateGameState"):FireServer(unpack(args))
 end
 
 local function equipEarthquake()
     local args = {"wep_earthquake"}
-    eventsFolder:WaitForChild("PlaySound"):FireServer(unpack(args))
+    eventsFolder:WaitForChild("ReplicateGameState"):FireServer(unpack(args))
 end
 
 local function equipHitscan()
     local args = {"hitscan"}
-    eventsFolder:WaitForChild("RenderMovementAction"):FireServer(unpack(args))
+    eventsFolder:WaitForChild("UnloadCharacter"):FireServer(unpack(args))
 end
 
 local function equipUlt()
     local args = {"ult"}
-    eventsFolder:WaitForChild("RenderMovementAction"):FireServer(unpack(args))
+    eventsFolder:WaitForChild("UnloadCharacter"):FireServer(unpack(args))
 end
 
 local function fireUlt()
     local args = {"primary", true, "ult"}
-    eventsFolder:WaitForChild("SkipCompile"):FireServer(unpack(args))
+    eventsFolder:WaitForChild("Attacked"):FireServer(unpack(args))
 end
 
 -- Create GUI
