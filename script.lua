@@ -1,147 +1,73 @@
--- Place this LocalScript in StarterGui
+-- Place this LocalScript under StarterGui or StarterPlayerScripts
+-- It will create a simple GUI with two buttons to control the looping sequence
 
--- Services
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
-print("[AutoUlt] Services loaded, playerGui obtained.")
-
--- Globals
-local eventsFolder = ReplicatedStorage:WaitForChild("shared/network@GlobalEvents")
-print("[AutoUlt] eventsFolder set to shared/network@GlobalEvents.")
-
--- State
-local uiVisible = true
-local isRunning = false
-print("[AutoUlt] Initial state - uiVisible:", uiVisible, "isRunning:", isRunning)
-
--- Sequence functions (direct FireServer calls)
-local function equipMeteor()
-    print("[AutoUlt] equipMeteor() called")
-    local args = {"wep_meteor"}
-    print("[AutoUlt] -> FireServer ReplicateGameState with args:", unpack(args))
-    eventsFolder:WaitForChild("ReplicateGameState"):FireServer(unpack(args))
-    print("[AutoUlt] equipMeteor() complete")
-end
-
-local function equipEarthquake()
-    print("[AutoUlt] equipEarthquake() called")
-    local args = {"wep_earthquake"}
-    print("[AutoUlt] -> FireServer ReplicateGameState with args:", unpack(args))
-    eventsFolder:WaitForChild("ReplicateGameState"):FireServer(unpack(args))
-    print("[AutoUlt] equipEarthquake() complete")
-end
-
-local function equipHitscan()
-    print("[AutoUlt] equipHitscan() called")
-    local args = {"hitscan"}
-    print("[AutoUlt] -> FireServer UnloadCharacter with args:", unpack(args))
-    eventsFolder:WaitForChild("UnloadCharacter"):FireServer(unpack(args))
-    print("[AutoUlt] equipHitscan() complete")
-end
-
-local function equipUlt()
-    print("[AutoUlt] equipUlt() called")
-    local args = {"ult"}
-    print("[AutoUlt] -> FireServer UnloadCharacter with args:", unpack(args))
-    eventsFolder:WaitForChild("UnloadCharacter"):FireServer(unpack(args))
-    print("[AutoUlt] equipUlt() complete")
-end
-
-local function fireUlt()
-    print("[AutoUlt] fireUlt() called")
-    local args = {"primary", true, "ult"}
-    print("[AutoUlt] -> FireServer Attacked with args:", unpack(args))
-    eventsFolder:WaitForChild("Attacked"):FireServer(unpack(args))
-    print("[AutoUlt] fireUlt() complete")
-end
-
--- Create GUI
+-- Create ScreenGui
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "AutoUltGui"
+screenGui.Name = "LoopControllerGUI"
 screenGui.ResetOnSpawn = false
-screenGui.Parent = playerGui
-print("[AutoUlt] ScreenGui created.")
+screenGui.Parent = game:GetService("StarterGui")
 
-local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 200, 0, 120)
-frame.Position = UDim2.new(0.5, -100, 0.5, -60)
-frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-frame.Parent = screenGui
-print("[AutoUlt] Frame created.")
+-- Create Visibility Toggle Button
+local visibilityBtn = Instance.new("TextButton")
+visibilityBtn.Name = "VisibilityButton"
+visibilityBtn.Size = UDim2.new(0, 150, 0, 50)
+visibilityBtn.Position = UDim2.new(0, 10, 0, 10)
+visibilityBtn.Text = "Hide GUI"
+visibilityBtn.Parent = screenGui
 
--- Hide UI Button
-local btnHide = Instance.new("TextButton")
-btnHide.Size = UDim2.new(1, -10, 0, 30)
-btnHide.Position = UDim2.new(0, 5, 0, 5)
-btnHide.Text = "Hide UI"
-btnHide.Parent = frame
-print("[AutoUlt] Hide UI button created.")
+-- Create Loop Toggle Button
+local loopBtn = Instance.new("TextButton")
+loopBtn.Name = "LoopButton"
+loopBtn.Size = UDim2.new(0, 150, 0, 50)
+loopBtn.Position = UDim2.new(0, 10, 0, 70)
+loopBtn.Text = "Start Loop"
+loopBtn.Parent = screenGui
 
--- Show UI Button
-local btnShow = Instance.new("TextButton")
-btnShow.Size = UDim2.new(0, 80, 0, 30)
-btnShow.Position = UDim2.new(0, 10, 0, 10)
-btnShow.Text = "Show UI"
-btnShow.Visible = false
-btnShow.Parent = screenGui
-print("[AutoUlt] Show UI button created.")
+-- State variables
+local loopEnabled = false
+local isGuiVisible = true
 
--- Start/Stop Button
-local btnMain = Instance.new("TextButton")
-btnMain.Size = UDim2.new(1, -10, 0, 30)
-btnMain.Position = UDim2.new(0, 5, 0, 85)
-btnMain.Text = "Start Auto Ult"
-btnMain.Parent = frame
-print("[AutoUlt] Start/Stop button created.")
+-- Function that runs the original sequence every 3 seconds
+local function runSequence()
+    while loopEnabled do
+        -- Play meteor sound
+        local args = {"wep_meteor"}
+        game:GetService("ReplicatedStorage"):WaitForChild("shared/network@GlobalEvents"):WaitForChild("PlaySound"):FireServer(unpack(args))
 
--- Button Logic
-btnHide.MouseButton1Click:Connect(function()
-    print("[AutoUlt] Hide UI clicked")
-    frame.Visible = false
-    btnShow.Visible = true
-    uiVisible = false
-    print("[AutoUlt] UI hidden, uiVisible set to false")
+        -- Play earthquake sound
+        args = {"wep_earthquake"}
+        game:GetService("ReplicatedStorage"):WaitForChild("shared/network@GlobalEvents"):WaitForChild("PlaySound"):FireServer(unpack(args))
+
+        -- Report hit scan stats again
+        args = {"hitscasn"}
+        game:GetService("ReplicatedStorage"):WaitForChild("shared/network@GlobalEvents"):WaitForChild("ReportServerDebugStats"):FireServer(unpack(args))
+        task.wait(0.3)
+
+        -- Report ultimate stats again
+        args = {"ult"}
+        game:GetService("ReplicatedStorage"):WaitForChild("shared/network@GlobalEvents"):WaitForChild("ReportServerDebugStats"):FireServer(unpack(args))
+
+        -- Update aim to ultimate again
+        args = {"primary", true, "ult"}
+        game:GetService("ReplicatedStorage"):WaitForChild("shared/network@GlobalEvents"):WaitForChild("UpdateAim"):FireServer(unpack(args))
+
+        -- Wait 3 seconds before repeating
+        task.wait(3)
+    end
+end
+
+-- Toggle GUI visibility
+visibilityBtn.MouseButton1Click:Connect(function()
+    isGuiVisible = not isGuiVisible
+    screenGui.Enabled = isGuiVisible
+    visibilityBtn.Text = isGuiVisible and "Hide GUI" or "Show GUI"
 end)
 
-btnShow.MouseButton1Click:Connect(function()
-    print("[AutoUlt] Show UI clicked")
-    frame.Visible = true
-    btnShow.Visible = false
-    uiVisible = true
-    print("[AutoUlt] UI shown, uiVisible set to true")
-end)
-
-btnMain.MouseButton1Click:Connect(function()
-    isRunning = not isRunning
-    print("[AutoUlt] Toggle run state, isRunning:", isRunning)
-    if isRunning then
-        btnMain.Text = "Stop Auto Ult"
-        print("[AutoUlt] Starting auto ult loop")
-        spawn(function()
-            while isRunning do
-                -- First rotation
-                equipMeteor()
-                equipHitscan()
-                equipUlt()
-                wait(2)
-                fireUlt()
-
-                -- Second rotation
-                equipEarthquake()
-                equipHitscan()
-                equipUlt()
-                wait(2)
-                fireUlt()
-
-                wait(2)
-                print("[AutoUlt] Loop iteration complete")
-            end
-            print("[AutoUlt] Exited auto ult loop")
-        end)
-    else
-        btnMain.Text = "Start Auto Ult"
-        print("[AutoUlt] Stopped auto ult loop")
+-- Toggle looping sequence
+loopBtn.MouseButton1Click:Connect(function()
+    loopEnabled = not loopEnabled
+    loopBtn.Text = loopEnabled and "Stop Loop" or "Start Loop"
+    if loopEnabled then
+        spawn(runSequence)
     end
 end)
