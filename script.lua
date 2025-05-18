@@ -7,7 +7,7 @@ local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
 -- Globals
-local eventsFolder = ReplicatedStorage:WaitForChild("shared"):WaitForChild("network@GlobalEvents")
+local eventsFolder = ReplicatedStorage:WaitForChild("shared/network@GlobalEvents")
 
 -- State
 local uiVisible = true
