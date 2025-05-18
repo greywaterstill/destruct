@@ -6,44 +6,38 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
--- Constants for remotes
-local GlobalEvents = ReplicatedStorage:WaitForChild("shared"):WaitForChild("network@GlobalEvents")
+-- Globals
+local eventsFolder = ReplicatedStorage:WaitForChild("shared"):WaitForChild("network@GlobalEvents")
 
 -- State
 local uiVisible = true
 local isRunning = false
 
--- Helper to fire remotes
-local function fireRemote(remoteName, ...)
-    local remote = GlobalEvents:FindFirstChild(remoteName)
-    if remote then
-        remote:FireServer(...)
-    else
-        warn("Remote not found:", remoteName)
-    end
-end
-
--- Sequence functions
+-- Sequence functions (direct FireServer calls)
 local function equipMeteor()
-    fireRemote("PlaySound", "wep_meteor")
+    local args = {"wep_meteor"}
+    eventsFolder:WaitForChild("PlaySound"):FireServer(unpack(args))
 end
 
 local function equipEarthquake()
-    fireRemote("PlaySound", "wep_earthquake")
+    local args = {"wep_earthquake"}
+    eventsFolder:WaitForChild("PlaySound"):FireServer(unpack(args))
 end
 
 local function equipHitscan()
-    fireRemote("RenderMovementAction", "hitscan")
+    local args = {"hitscan"}
+    eventsFolder:WaitForChild("RenderMovementAction"):FireServer(unpack(args))
 end
 
 local function equipUlt()
-    fireRemote("RenderMovementAction", "ult")
+    local args = {"ult"}
+    eventsFolder:WaitForChild("RenderMovementAction"):FireServer(unpack(args))
 end
 
 local function fireUlt()
-    fireRemote("SkipCompile", "primary", true, "ult")
+    local args = {"primary", true, "ult"}
+    eventsFolder:WaitForChild("SkipCompile"):FireServer(unpack(args))
 end
-
 
 -- Create GUI
 local screenGui = Instance.new("ScreenGui")
@@ -57,29 +51,29 @@ frame.Position = UDim2.new(0.5, -100, 0.5, -60)
 frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 frame.Parent = screenGui
 
--- Toggle Off Button
+-- Hide UI Button
 local btnHide = Instance.new("TextButton")
 btnHide.Size = UDim2.new(1, -10, 0, 30)
 btnHide.Position = UDim2.new(0, 5, 0, 5)
 btnHide.Text = "Hide UI"
 btnHide.Parent = frame
 
--- Toggle On Button
+-- Show UI Button
 local btnShow = Instance.new("TextButton")
-btnShow.Size = UDim2.new(1, -10, 0, 30)
-btnShow.Position = UDim2.new(0, 5, 0, 45)
+btnShow.Size = UDim2.new(0, 80, 0, 30)
+btnShow.Position = UDim2.new(0, 10, 0, 10)
 btnShow.Text = "Show UI"
 btnShow.Visible = false
 btnShow.Parent = screenGui
 
--- Main Loop Button
+-- Start/Stop Button
 local btnMain = Instance.new("TextButton")
 btnMain.Size = UDim2.new(1, -10, 0, 30)
 btnMain.Position = UDim2.new(0, 5, 0, 85)
 btnMain.Text = "Start Auto Ult"
 btnMain.Parent = frame
 
--- Button behavior
+-- Button Logic
 btnHide.MouseButton1Click:Connect(function()
     frame.Visible = false
     btnShow.Visible = true
@@ -96,17 +90,16 @@ btnMain.MouseButton1Click:Connect(function()
     isRunning = not isRunning
     if isRunning then
         btnMain.Text = "Stop Auto Ult"
-        -- Run sequence on separate thread
         spawn(function()
             while isRunning do
-                -- First pass
+                -- First rotation
                 equipMeteor()
                 equipHitscan()
                 equipUlt()
                 wait(0.2)
                 fireUlt()
 
-                -- Second pass
+                -- Second rotation
                 equipEarthquake()
                 equipHitscan()
                 equipUlt()
