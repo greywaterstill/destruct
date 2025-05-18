@@ -32,27 +32,27 @@ local function runSequence()
     while loopEnabled do
         -- Play meteor sound
         local args = {"wep_meteor"}
-        game:GetService("ReplicatedStorage"):WaitForChild("shared/network@GlobalEvents"):WaitForChild("PlaySound"):FireServer(unpack(args))
+        game:GetService("ReplicatedStorage"):WaitForChild("shared/network@GlobalEvents"):WaitForChild("UnloadCharacter"):FireServer(unpack(args))
 
         -- Play earthquake sound
         args = {"wep_earthquake"}
-        game:GetService("ReplicatedStorage"):WaitForChild("shared/network@GlobalEvents"):WaitForChild("PlaySound"):FireServer(unpack(args))
+        game:GetService("ReplicatedStorage"):WaitForChild("shared/network@GlobalEvents"):WaitForChild("UnloadCharacter"):FireServer(unpack(args))
 
         -- Report hit scan stats again
         args = {"hitscasn"}
-        game:GetService("ReplicatedStorage"):WaitForChild("shared/network@GlobalEvents"):WaitForChild("ReportServerDebugStats"):FireServer(unpack(args))
-        task.wait(0.3)
+        game:GetService("ReplicatedStorage"):WaitForChild("shared/network@GlobalEvents"):WaitForChild("MovementAction"):FireServer(unpack(args))
+        task.wait(0.2)
 
         -- Report ultimate stats again
         args = {"ult"}
-        game:GetService("ReplicatedStorage"):WaitForChild("shared/network@GlobalEvents"):WaitForChild("ReportServerDebugStats"):FireServer(unpack(args))
+        game:GetService("ReplicatedStorage"):WaitForChild("shared/network@GlobalEvents"):WaitForChild("MovementAction"):FireServer(unpack(args))
 
         -- Update aim to ultimate again
         args = {"primary", true, "ult"}
-        game:GetService("ReplicatedStorage"):WaitForChild("shared/network@GlobalEvents"):WaitForChild("UpdateAim"):FireServer(unpack(args))
+        game:GetService("ReplicatedStorage"):WaitForChild("shared/network@GlobalEvents"):WaitForChild("VoxelBreak"):FireServer(unpack(args))
 
         -- Wait 3 seconds before repeating
-        task.wait(3)
+        task.wait(1)
     end
 end
 
