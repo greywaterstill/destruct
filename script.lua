@@ -35,11 +35,16 @@ local function runSequence()
         local args = {"wep_meteor"}
         game:GetService("ReplicatedStorage"):WaitForChild("shared/network@GlobalEvents"):WaitForChild("UnloadCharacter"):FireServer(unpack(args))
 
-        -- Play earthquake sound
+        
+        args = {"hitscasn"}
+        game:GetService("ReplicatedStorage"):WaitForChild("shared/network@GlobalEvents"):WaitForChild("MovementAction"):FireServer(unpack(args))
+        
+        task.wait(0.2)
+        
         args = {"wep_earthquake"}
         game:GetService("ReplicatedStorage"):WaitForChild("shared/network@GlobalEvents"):WaitForChild("UnloadCharacter"):FireServer(unpack(args))
 
-        -- Report hit scan stats again
+
         args = {"hitscasn"}
         game:GetService("ReplicatedStorage"):WaitForChild("shared/network@GlobalEvents"):WaitForChild("MovementAction"):FireServer(unpack(args))
         task.wait(0.2)
@@ -52,7 +57,14 @@ local function runSequence()
         args = {"primary", true, "ult"}
         game:GetService("ReplicatedStorage"):WaitForChild("shared/network@GlobalEvents"):WaitForChild("VoxelBreak"):FireServer(unpack(args))
 
-        -- Wait 3 seconds before repeating
+        args = {"hitscasn"}
+        game:GetService("ReplicatedStorage"):WaitForChild("shared/network@GlobalEvents"):WaitForChild("MovementAction"):FireServer(unpack(args))
+
+        task.wait(0.2)
+
+        local args = {"wep_meteor"}
+        game:GetService("ReplicatedStorage"):WaitForChild("shared/network@GlobalEvents"):WaitForChild("UnloadCharacter"):FireServer(unpack(args))
+        
         task.wait(1)
     end
 end
