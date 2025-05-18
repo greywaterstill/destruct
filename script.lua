@@ -96,17 +96,17 @@ btnMain.MouseButton1Click:Connect(function()
                 equipMeteor()
                 equipHitscan()
                 equipUlt()
-                wait(0.2)
+                wait(2)
                 fireUlt()
 
                 -- Second rotation
                 equipEarthquake()
                 equipHitscan()
                 equipUlt()
-                wait(0.2)
+                wait(2)
                 fireUlt()
 
-                wait(0.2)
+                wait(2)
             end
         end)
     else
